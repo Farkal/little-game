@@ -11,7 +11,12 @@ import './index.css'
 const routes = [
   { path: '/', name: 'heros', component: Heros },
   { path: '/login', name: 'login', component: () => import('./views/Login.vue') },
-  { path: '/hero/:id', name: 'hero', component: () => import('./views/HeroDetails.vue'), props: true },
+  {
+    path: '/hero/:id',
+    name: 'hero',
+    component: () => import('./views/HeroDetails.vue'),
+    props: true,
+  },
 ]
 
 const router = createRouter({

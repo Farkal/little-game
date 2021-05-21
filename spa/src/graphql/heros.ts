@@ -8,7 +8,7 @@ const HeroFragment = `
   attack
   defense
   magik
-` 
+`
 
 export const SEARCH_HEROS = `
   query {
@@ -16,7 +16,7 @@ export const SEARCH_HEROS = `
       ${HeroFragment}
     }
   }
-`;
+`
 
 export const READ_HERO = `
   query($id: String! ) {
@@ -24,4 +24,4 @@ export const READ_HERO = `
       ${HeroFragment}
     }
   }
-`;
+`
