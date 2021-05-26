@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { EntityOrm } from '@core/entity.orm';
 import { UserOrm } from '@modules/user/user.orm';
+import { FightOrm } from './fight.orm';
 
 @Entity('hero')
 export class HeroOrm extends EntityOrm {
@@ -38,4 +39,8 @@ export class HeroOrm extends EntityOrm {
   @ManyToOne(() => UserOrm, (user) => user.heros)
   @JoinColumn()
   user?: UserOrm;
+
+  @OneToMany(() => FightOrm, (fight) => fight.hero, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  fights?: FightOrm[];
 }

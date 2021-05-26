@@ -24,18 +24,22 @@ export default {
     return { createHero }
   },
   methods: {
+    toggleOpen() {
+      this.$emit('update:open', !this.open)
+    },
     async createHero() {
-      console.log('Creating hero', this.name)
       const res = await this.createHero({ name: this.name })
-
-      console.log('RES', res)
+      if (res && res.data) {
+        this.$emit('update:open', false)
+      }
     },
   },
 }
 </script>
 <template>
-  <Popover class="relative">
+  <Popover v-model="open" class="relative">
     <PopoverButton
+      @click="toggleOpen"
       class="
         focus:outline-none
         text-white text-sm
@@ -63,7 +67,11 @@ export default {
       </svg>
     </PopoverButton>
 
-    <PopoverPanel class="absolute z-10 bg-gray-300 p-4 rounded-md w-screen mt-3 max-w-sm right-1">
+    <PopoverPanel
+      v-if="open"
+      static
+      class="absolute z-10 bg-gray-300 p-4 rounded-md w-screen mt-3 max-w-sm right-1"
+    >
       <form @submit.prevent="createHero">
         <label class="text-gray-700 dark:text-gray-200" for="username">Hero name:</label>
         <input

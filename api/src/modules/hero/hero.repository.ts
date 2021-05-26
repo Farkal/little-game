@@ -8,6 +8,7 @@ import { NotFoundException } from '@core/exceptions';
 export const HERO_REPOSITORY = 'HERO REPOSITORY';
 export interface HeroRepository {
   search(criterias: HerosSearchCriterias): Promise<Hero[]>;
+  searchEnemies(userId: string, heroRank: number): Promise<Hero[]>;
   read(id: string): Promise<Hero>;
   create(hero: Hero): Promise<Hero>;
   update(hero: Hero): Promise<Hero>;
@@ -30,6 +31,18 @@ export class HeroDatabaseRepository implements HeroRepository {
   async search(criterias: HerosSearchCriterias) {
     const heros = await this.herosRepository.find(criterias);
     return heros.map((u) => this.mapper.toDomain(u));
+  }
+
+  async searchEnemies(userId: string, heroRank: number) {
+    // TODO: Get the number of fight with hero
+    // TODO: Add this condition on fight "createdAt" < NOW() - INTERVAL '1' HOUR
+    const enemies = await this.herosRepository
+      .createQueryBuilder('hero')
+      .select()
+      .where('hero.userId != :userId', { userId })
+      .orderBy(`ABS(hero.rank - ${heroRank})`, 'ASC')
+      .getMany();
+    return enemies.map((u) => this.mapper.toDomain(u));
   }
 
   async read(id: string) {

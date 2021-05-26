@@ -39,11 +39,13 @@ describe('AttributeSkillPointsToHeroInteractor', () => {
   });
   it('should throw if more skill points attributed than availables', async () => {
     const interactor = new AttributeSkillPointsToHeroInteractor(heroRepository);
-    await expect(interactor.attributeSkillPoints('myUserId', 'myId', {
-      health: 1,
-      attack: 7,
-      defense: 3,
-      magik: 1,
-    })).rejects.toThrow();
+    await expect(
+      interactor.attributeSkillPoints('myUserId', 'myId', {
+        health: 1,
+        attack: 7,
+        defense: 3,
+        magik: 1,
+      }),
+    ).rejects.toThrow();
   });
 });

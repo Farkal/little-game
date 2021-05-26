@@ -14,6 +14,6 @@ export class UserOrm extends EntityOrm {
   @Column()
   hashedPassword: string;
 
-  @OneToMany(() => HeroOrm, (hero) => hero.user)
+  @OneToMany(() => HeroOrm, (hero) => hero.user, { onDelete: 'CASCADE' })
   heros?: HeroOrm[];
 }

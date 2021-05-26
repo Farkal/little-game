@@ -14,7 +14,7 @@ export class AttributeSkillPointsToHeroInteractor {
   private computeSpecialSkill(current: number, add: number) {
     let nbSkillPointUsed = 0;
     for (let i = 0; i < add; i++) {
-      const cost = Math.ceil((current + i) / 5) || 1
+      const cost = Math.ceil((current + i) / 5) || 1;
       nbSkillPointUsed += cost;
     }
     return nbSkillPointUsed;

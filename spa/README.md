@@ -14,15 +14,14 @@ Run development server:
 npm run dev
 ```
 
-Open Cypress test runner:
+Open Cypress test runner (not implemented):
 
 ```
 npm run test
 ```
 
-Run Cypress tests in headless mode:
+Run Cypress tests in headless mode (not implemented):
 
 ```
 npm run test:ci
 ```
-

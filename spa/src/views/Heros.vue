@@ -1,12 +1,12 @@
 <script lang="ts">
 import { useQuery } from '@urql/vue'
-import Hero from '../components/Hero.vue'
+import HeroCard from '../components/HeroCard.vue'
 import CreateHero from '../components/CreateHero.vue'
 import { SEARCH_HEROS } from '../graphql/heros'
 
 export default {
   components: {
-    Hero,
+    HeroCard,
     CreateHero,
   },
   data() {
@@ -22,8 +22,6 @@ export default {
     const result = useQuery({
       query: SEARCH_HEROS,
     })
-    console.log('TOTO', result)
-
     return {
       // loading: result.fetching,
       data: result.data,
@@ -48,7 +46,7 @@ export default {
         </div>
         <div v-if="error">Error: {{ error.message }}</div>
         <div v-else-if="data && data.heros" class="grid grid-cols-12 gap-6 mt-5">
-          <Hero v-for="hero in data.heros" :hero="hero"></Hero>
+          <HeroCard v-for="hero in data.heros" :hero="hero" />
         </div>
       </div>
     </div>

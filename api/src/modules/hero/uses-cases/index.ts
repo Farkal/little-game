@@ -3,3 +3,7 @@ export { ReadHeroInteractor } from './readHero';
 export { SearchHeroInteractor } from './searchHero';
 export { DeleteHeroInteractor } from './deleteHero';
 export { AttributeSkillPointsToHeroInteractor } from './attributeSkillPointsToHero';
+export { StartFightInteractor } from './startFight';
+export { ReadFightInteractor } from './readFight';
+export { SearchFightRoundInteractor } from './searchFightRound';
+export { SearchFightInteractor } from './searchFight';

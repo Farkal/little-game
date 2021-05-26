@@ -17,6 +17,12 @@ const routes = [
     component: () => import('./views/HeroDetails.vue'),
     props: true,
   },
+  {
+    path: '/fight/:id',
+    name: 'fight',
+    component: () => import('./views/Fight.vue'),
+    props: true,
+  },
 ]
 
 const router = createRouter({
@@ -35,6 +41,7 @@ app.use(router)
 
 // Graphql
 app.use(urql, {
+  requestPolicy: 'network-only',
   url: 'http://localhost:3020/graphql',
   fetchOptions: () => {
     const token = app.config.globalProperties.$auth.token

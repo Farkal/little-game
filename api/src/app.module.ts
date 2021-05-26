@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MercuriusModule } from 'nestjs-mercurius';
 import { typeormConfig } from '@config/orm';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CatsModule } from '@modules/cat/cat.module';
 import { UserModule } from '@modules/user/user.module';
 import { HeroModule } from '@modules/hero/hero.module';
 @Module({
@@ -21,7 +20,6 @@ import { HeroModule } from '@modules/hero/hero.module';
         // }),
       },
     }),
-    CatsModule,
     UserModule,
     HeroModule,
   ],

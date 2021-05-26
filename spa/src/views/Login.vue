@@ -39,7 +39,6 @@ export default {
   methods: {
     async loginOrCreate() {
       this.authError = ''
-      console.log(this.username, this.password, this.mode)
       const variables = { username: this.username, password: this.password }
       if (this.mode === Mode.Login) {
         const res = await this.login(variables)
@@ -65,7 +64,7 @@ export default {
 }
 </script>
 <template>
-  <div class="col-span-12 flex inline-flex mt-2 mr-2" role="group">
+  <div class="col-span-12 flex inline-flex mt-4 ml-4" role="group">
     <button
       type="button"
       class="
@@ -101,7 +100,7 @@ export default {
       Create Account
     </button>
   </div>
-  <form class="col-span-12" @submit.prevent="loginOrCreate">
+  <form class="col-span-12 mx-4 mt-4" @submit.prevent="loginOrCreate">
     <div>
       <label class="text-gray-700 dark:text-gray-200" for="username">Username</label>
       <input

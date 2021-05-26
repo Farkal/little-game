@@ -9,6 +9,15 @@ const HeroFragment = `
   defense
   magik
 `
+const HeroFights = `
+  fights {
+    id
+    enemy {
+      name
+    }
+    status
+  }
+`
 
 export const SEARCH_HEROS = `
   query {
@@ -22,6 +31,7 @@ export const READ_HERO = `
   query($id: String! ) {
     hero(id: $id) {
       ${HeroFragment}
+      ${HeroFights}
     }
   }
 `

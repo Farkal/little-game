@@ -11,6 +11,7 @@ import {
   Context,
   Args,
   InputType,
+  registerEnumType,
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { EntityGql } from '@core/entity.graphql';
@@ -21,9 +22,50 @@ import {
   ReadHeroInteractor,
   DeleteHeroInteractor,
   AttributeSkillPointsToHeroInteractor,
-  // FightHeroInteractor
+  StartFightInteractor,
+  ReadFightInteractor,
+  SearchFightInteractor,
+  SearchFightRoundInteractor,
 } from '../uses-cases';
 import { HeroMapper } from '../hero.mapper';
+import { FightMapper } from '../fight.mapper';
+import { FightRoundMapper } from '../fightRound.mapper';
+import { FightStatus } from '../fight.entity';
+
+registerEnumType(FightStatus, {
+  name: 'FightStatus',
+});
+
+@ObjectType({ description: 'Object representing a Fight' })
+export class FightRound extends EntityGql {
+  @Field()
+  number: number;
+  @Field()
+  heroAttack: number;
+  @Field()
+  enemyAttack: number;
+  @Field()
+  heroHealthSub: number;
+  @Field()
+  enemyHealthSub: number;
+
+  constructor(props?: FightRound) {
+    super(props);
+  }
+}
+
+@ObjectType({ description: 'Object representing a Fight' })
+export class Fight extends EntityGql {
+  heroId: string;
+  enemyId: string;
+
+  @Field((type) => FightStatus)
+  status: FightStatus;
+
+  constructor(props?: Fight) {
+    super(props);
+  }
+}
 
 @InputType()
 export class AttributeSkillPointsInput {
@@ -68,7 +110,7 @@ export class Hero extends EntityGql {
   }
 }
 
-@Resolver(() => Hero)
+@Resolver((of) => Hero)
 export class HeroResolver {
   constructor(
     private readonly createHeroInteractor: CreateHeroInteractor,
@@ -76,12 +118,22 @@ export class HeroResolver {
     private readonly searchHeroInteractor: SearchHeroInteractor,
     private readonly readHeroInteractor: ReadHeroInteractor,
     private readonly deleteHeroInteractor: DeleteHeroInteractor,
-  ) // private readonly fightHeroInteractor: FightHeroInteractor,
-  {
+    private readonly searchFightInteractor: SearchFightInteractor,
+  ) {
     this.mapper = new HeroMapper();
+    this.fightMapper = new FightMapper();
   }
 
   private readonly mapper: HeroMapper;
+  private readonly fightMapper: FightMapper;
+
+  @ResolveField(() => [Fight])
+  async fights(@Parent() hero: Hero) {
+    const fights = await this.searchFightInteractor.search({
+      heroId: hero.id,
+    });
+    return fights.map((u) => this.fightMapper.toGql(u));
+  }
 
   @Query(() => [Hero], { description: 'Get all the heros' })
   @UseGuards(GqlAuthGuard)
@@ -137,5 +189,62 @@ export class HeroResolver {
   async deleteHero(@CurrentUser() user: UserPayload, @Args('id') id: string) {
     await this.deleteHeroInteractor.delete(user.id, id);
     return true;
+  }
+}
+
+@Resolver((of) => Fight)
+export class FightResolver {
+  constructor(
+    private readonly readHeroInteractor: ReadHeroInteractor,
+    private readonly searchFightRoundInteractor: SearchFightRoundInteractor,
+    private readonly startFightInteractor: StartFightInteractor,
+    private readonly readFightInteractor: ReadFightInteractor,
+  ) {
+    this.mapper = new FightMapper();
+    this.heroMapper = new HeroMapper();
+    this.fightRoundMapper = new FightRoundMapper();
+  }
+  private readonly mapper: FightMapper;
+  private readonly heroMapper: HeroMapper;
+  private readonly fightRoundMapper: FightRoundMapper;
+
+  @ResolveField(() => Hero)
+  async hero(@Parent() fight: Fight) {
+    const hero = await this.readHeroInteractor.read(fight.heroId);
+    return this.heroMapper.toGql(hero);
+  }
+
+  @ResolveField(() => Hero)
+  async enemy(@Parent() fight: Fight) {
+    const enemy = await this.readHeroInteractor.read(fight.enemyId);
+    return this.heroMapper.toGql(enemy);
+  }
+
+  @ResolveField(() => [FightRound])
+  async rounds(@Parent() fight: Fight) {
+    const rounds = await this.searchFightRoundInteractor.search({
+      fightId: fight.id,
+    });
+    return rounds.map((u) => this.fightRoundMapper.toGql(u));
+  }
+
+  @Query(() => Fight, { nullable: true })
+  @UseGuards(GqlAuthGuard)
+  async fight(@Args('id') id: string) {
+    const fight = await this.readFightInteractor.read(id);
+    return this.mapper.toGql(fight);
+  }
+
+  @Mutation(() => Fight)
+  @UseGuards(GqlAuthGuard)
+  async startFight(
+    @CurrentUser() user: UserPayload,
+    @Args('heroId') heroId: string,
+  ) {
+    const newFight = await this.startFightInteractor.startFight(
+      user.id,
+      heroId,
+    );
+    return this.mapper.toGql(newFight);
   }
 }

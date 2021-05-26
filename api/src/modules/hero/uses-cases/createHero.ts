@@ -6,7 +6,7 @@ import { HeroRepository, HERO_REPOSITORY } from '../hero.repository';
 export class CreateHeroInteractor {
   constructor(
     @Inject(HERO_REPOSITORY)
-    private readonly heroRepo: HeroRepository, // private readonly createTokenInteractor,
+    private readonly heroRepo: HeroRepository,
   ) {}
 
   async create(userId: string, name: string) {

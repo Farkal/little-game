@@ -1,6 +1,10 @@
 import { EntityBase, BaseProps } from '@core/entity.base';
 import { User } from '@modules/user/user.entity';
 
+function randomBetween(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export interface HeroProps extends BaseProps {
   name: string;
   level: number;
@@ -56,27 +60,50 @@ export class Hero extends EntityBase {
     return this._health;
   }
   set health(val: number) {
-    this._health = val
+    this._health = val;
   }
   get attack() {
     return this._attack;
   }
   set attack(val: number) {
-    this._attack = val
+    this._attack = val;
   }
   get defense() {
     return this._defense;
   }
   set defense(val: number) {
-    this._defense = val
+    this._defense = val;
   }
   get magik() {
     return this._magik;
   }
   set magik(val: number) {
-    this._magik = val
+    this._magik = val;
   }
   get userId() {
     return this._userId;
+  }
+
+  fightRound(enemy: Hero) {
+    const attack = this.attack ? randomBetween(1, this.attack) : 0;
+    let diff = attack - enemy.defense;
+    if (diff > 0) {
+      // Attack succeed
+      if (diff == this.magik) {
+        diff += this.magik;
+      }
+      enemy.health -= diff;
+    }
+    return { enemy, attack, healthSub: diff > 0 ? diff : 0 };
+  }
+
+  win() {
+    this._level += 1;
+    this._rank += 1;
+    this._skillPoints += 1;
+  }
+  lose() {
+    this._level += 1;
+    if (this.rank > 1) this._rank -= 1;
   }
 }

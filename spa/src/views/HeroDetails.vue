@@ -1,10 +1,12 @@
 <script lang="ts">
 import { useQuery, useMutation } from '@urql/vue'
 import { READ_HERO } from '../graphql/heros'
+import FightButton from '../components/FightButton.vue'
 import Skill from '../components/Skill.vue'
 export default {
   components: {
     Skill,
+    FightButton,
   },
   props: ['id'],
   data() {
@@ -16,18 +18,11 @@ export default {
     }
   },
   setup({ id }) {
-    const { executeMutation: fight } = useMutation(`
-            mutation ($id: String!) {
-              fight (id: $id) {
-                  id
-                }
-            }
-          `)
     const { executeMutation: saveHero } = useMutation(`
             mutation ($id: String!, $attributeSkillPointsInput: AttributeSkillPointsInput!) {
               attributeSkillPointsToHero (id: $id, attributeSkillPointsInput: $attributeSkillPointsInput) {
-                  id
-                }
+              id
+            }
             }
           `)
     const { executeMutation: deleteHero } = useMutation(`
@@ -90,13 +85,6 @@ export default {
       this.data.hero.skillPoints -= skillPointCost
       this.magikInc += val
     },
-    async fight() {
-      const variables = { id: this.id }
-      const res = await this.fight(variables)
-      if (res.data && res.data.fight) {
-        this.$router.push({ name: 'fight', params: { id: res.data.fight.id } })
-      }
-    },
     async saveHero() {
       if (!this.needSave) return
       const variables = {
@@ -122,6 +110,15 @@ export default {
       if (!res.error) {
         this.$router.push({ name: 'heros' })
       }
+    },
+    statusClass(status) {
+      if (status == 'Victory') {
+        return 'bg-green-500'
+      }
+      if (status == 'Defeat') {
+        return 'bg-red-500'
+      }
+      return 'bg-yellow-500'
     },
   },
 }
@@ -183,34 +180,7 @@ export default {
     </div>
     <div class="flex justify-start">
       <div class="inline-block mr-2 mt-2">
-        <button
-          type="button"
-          class="
-            focus:outline-none
-            text-blue-600 text-xs
-            py-2
-            px-4
-            rounded-md
-            border border-blue-600
-            hover:bg-blue-50
-            flex
-            items-center
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          Fight
-        </button>
+        <FightButton :id="id" />
       </div>
       <div class="inline-block mr-2 mt-2">
         <button
@@ -276,6 +246,40 @@ export default {
             /></svg
           >Delete
         </button>
+      </div>
+    </div>
+    <div class="mt-4 grid grid-cols-12 gap-6">
+      <p>Fights:</p>
+      <div
+        v-for="fight in data.hero.fights"
+        class="shadow-xl rounded-lg col-span-12 intro-y bg-white"
+      >
+        <div class="w-full text-white" :class="statusClass(fight.status)">
+          <div class="container flex items-center justify-between px-6 py-4 mx-auto">
+            <div class="flex">
+              <svg v-if="fight.status == 'Victory'" class="w-6 h-6" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"
+                />
+              </svg>
+              <svg v-if="fight.status == 'Draw'" class="w-6 h-6" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M11 6H14L17.29 2.7A1 1 0 0 1 18.71 2.7L21.29 5.29A1 1 0 0 1 21.29 6.7L19 9H11V11A1 1 0 0 1 10 12A1 1 0 0 1 9 11V8A2 2 0 0 1 11 6M5 11V15L2.71 17.29A1 1 0 0 0 2.71 18.7L5.29 21.29A1 1 0 0 0 6.71 21.29L11 17H15A1 1 0 0 0 16 16V15H17A1 1 0 0 0 18 14V13H19A1 1 0 0 0 20 12V11H13V12A2 2 0 0 1 11 14H9A2 2 0 0 1 7 12V9Z"
+                />
+              </svg>
+              <svg v-if="fight.status == 'Defeat'" class="w-6 h-6" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12,2A9,9 0 0,0 3,11C3,14.03 4.53,16.82 7,18.47V22H9V19H11V22H13V19H15V22H17V18.46C19.47,16.81 21,14 21,11A9,9 0 0,0 12,2M8,11A2,2 0 0,1 10,13A2,2 0 0,1 8,15A2,2 0 0,1 6,13A2,2 0 0,1 8,11M16,11A2,2 0 0,1 18,13A2,2 0 0,1 16,15A2,2 0 0,1 14,13A2,2 0 0,1 16,11M12,14L13.5,17H10.5L12,14Z"
+                />
+              </svg>
+
+              <a class="mx-3">{{ fight.status }}: You vs {{ fight.enemy.name }}</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
