@@ -19,8 +19,8 @@
 ## Quick Start
 ```bash
 # open a terminal
-docker-compose up -d # Launch database with pg-admin
 cd api
+docker-compose up -d # Launch database with pg-admin
 npm install
 # For dev
 npm run start:dev
