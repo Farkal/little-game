@@ -22,6 +22,10 @@
 docker-compose up -d # Launch database with pg-admin
 cd api
 npm install
+# For dev
+npm run start:dev
+# For Prod
+npm run build
 npm run start:prod
 # open another terminal
 cd spa
